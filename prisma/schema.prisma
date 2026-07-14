@@ -44,7 +44,7 @@ model User {
   refreshToken String? @map("refresh_token")
 
   posts        Post[]
-
+  bookmarks    Post[]  @relation("bookmarks")
   @@map("user")
 }
 
@@ -57,7 +57,10 @@ model Post {
   authorId  String   @map("author_id")
 
   author    User     @relation(fields: [authorId], references: [id])
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
 
+  bookmarkedBy User[] @relation("bookmarks")
   @@map("post")
   @@index([authorId])
 }

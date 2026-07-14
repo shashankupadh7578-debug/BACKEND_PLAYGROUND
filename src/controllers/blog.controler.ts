@@ -2,6 +2,7 @@ import { prisma } from "../db/db.js"
 import type { Request, Response } from "express"
 import type { Authrequest } from "../middlewares/verifyjwt.js"
 import { createService, getblogs, findblog, updateblogservice, deleteblogservice } from "../services/blog.services.js"
+import { bookmarkThePost } from "../services/blog.services.js"
 export interface createBlogbody {
     title: string,
     content: string,
@@ -148,21 +149,42 @@ export const deleteblog = async(req:Authrequest,res:Response)=>{
             return res.status(400).json({message:"wrong id type",success:false})
         }
         const blog =  await findblog(id)
+        if(!blog){
+            return res.status(400).json({message : "blog doesnt exist" , success :false})
+        }
         if(blog!.authorId !== req.user?.userid){
             return res.status(400).json({message:"dont touch other people's blogs asshole",success:false})
         }
         const deletedblog = await deleteblogservice(id)
-
+    
         return res.status(200).json({message:"blog deleted",deletedblog,success:true})
     } catch (error) {
-         const message = error instanceof Error ? error.message : "weird error | delete controller"
+        const message = error instanceof Error ? error.message : "weird error | delete controller"
         return res.status(500).json({ message: `create controller error | ${message}` })
     }
 }
 
 
 
+export const bookmarkPost = async(req:Authrequest,res:Response)=>{
+    try {
+        const {postid} = req.params
+        const userid = req.user?.userid
+        if(typeof postid !== "string"){
+            return res.status(400).json({message : "postid is not string",success:false})
+        }
+        if(!postid || !userid){
+            return res.status(400).json({message : "invalid credentials",success:false})
+        }
 
+        const bookmarked = await bookmarkThePost(postid,userid)
+
+        return res.status(200).json({message : "post bookmarked",bookmarked,success:true})
+    } catch (error) {
+         const message = error instanceof Error ? error.message : "weird error | delete controller"
+        return res.status(500).json({ message: `create controller error | ${message}` })
+    }
+}
 
 
 

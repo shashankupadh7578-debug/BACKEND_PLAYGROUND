@@ -65,3 +65,27 @@ export const login = async(email :string,password :string)=>{
         throw error
     }
 }
+
+export const updateTheUser = async(id : string,newname : string)=>{
+    const user = await prisma.user.update({
+        where : {
+            id : id
+        },
+        data : {
+            name : newname
+        }
+    })
+    return user;
+}
+
+export const changeThePassword = async(id :string,password:string)=>{
+    const changepassword = await prisma.user.update({
+        where:{
+            id
+        },
+        data : {
+            password : password
+        }
+    })
+    return changepassword
+}

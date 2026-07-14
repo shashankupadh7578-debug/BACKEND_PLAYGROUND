@@ -111,9 +111,33 @@ export const updateblogservice = async(id:string,title:string,content:string)=>{
 }
 
 export const deleteblogservice = async(id:string)=>{
-    return await prisma.post.delete({
+    const post  = await prisma.post.update({
         where:{
-            id
+            id : id
+        },
+        data :{
+            isDeleted : true,
+            deletedAt : new Date()
         }
     })
+}
+
+export const bookmarkThePost = async(postid : string,userid:string)=>{
+    const post  = await prisma.user.update({
+        where : {
+            id : userid
+        },
+        data : {
+            bookmarks:{
+                connect : {
+                    id : postid
+                }
+            }
+        },
+        select:{
+            bookmarks:true
+        }
+    })
+
+    return post;
 }
