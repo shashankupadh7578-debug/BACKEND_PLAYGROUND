@@ -1,0 +1,20 @@
+npm i express @prisma/client@6
+npm i -D prisma@6 typescript ts-node nodemon @types/node @types/express
+
+
+npx tsc --init
+npx prisma init
+
+fix env
+
+
+prisma/schema
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
