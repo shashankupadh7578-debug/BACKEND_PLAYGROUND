@@ -141,3 +141,41 @@ export const bookmarkThePost = async(postid : string,userid:string)=>{
 
     return post;
 }
+
+export const removeBookmark = async (
+    userId: string,
+    postId: string
+) => {
+    const removedBookmark = await prisma.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            bookmarks: {
+                disconnect: {
+                    id: postId,
+                },
+            },
+        },
+    });
+
+    return removedBookmark;
+};
+
+
+export const getBookmarks = async (userId: string) => {
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userId,
+        },
+        select: {
+            bookmarks: {
+                where: {
+                    isDeleted: false,
+                },
+            },
+        },
+    });
+
+    return user?.bookmarks;
+};

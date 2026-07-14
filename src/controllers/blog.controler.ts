@@ -1,7 +1,7 @@
 import { prisma } from "../db/db.js"
 import type { Request, Response } from "express"
 import type { Authrequest } from "../middlewares/verifyjwt.js"
-import { createService, getblogs, findblog, updateblogservice, deleteblogservice } from "../services/blog.services.js"
+import { createService, getblogs, findblog, updateblogservice, deleteblogservice ,removeBookmark,getBookmarks} from "../services/blog.services.js"
 import { bookmarkThePost } from "../services/blog.services.js"
 export interface createBlogbody {
     title: string,
@@ -186,5 +186,72 @@ export const bookmarkPost = async(req:Authrequest,res:Response)=>{
     }
 }
 
+export const removeBookmarkController = async (
+    req: Authrequest,
+    res: Response
+) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user?.userid;
+
+        if (!id || !userId) {
+            return res.status(400).json({
+                success: false,
+                message: "Insufficient details",
+            });
+        }
+        if(typeof id !== "string"){
+            return res.status(400).json({message  :"id type fault",success:false})
+        }
+        const removedBookmark = await removeBookmark(userId, id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Bookmark removed successfully",
+            removedBookmark,
+        });
+
+    } catch (error) {
+        const message =
+            error instanceof Error ? error.message : "Unknown error";
+
+        return res.status(500).json({
+            success: false,
+            message: `Remove bookmark error: ${message}`,
+        });
+    }
+};
 
 
+export const getMyBookmarks = async (
+    req: Authrequest,
+    res: Response
+) => {
+    try {
+        const userId = req.user?.userid;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized",
+            });
+        }
+
+        const bookmarks = await getBookmarks(userId);
+
+        return res.status(200).json({
+            success: true,
+            message: "Bookmarks fetched successfully",
+            bookmarks,
+        });
+
+    } catch (error) {
+        const message =
+            error instanceof Error ? error.message : "Unknown error";
+
+        return res.status(500).json({
+            success: false,
+            message: `Get bookmarks error: ${message}`,
+        });
+    }
+};
