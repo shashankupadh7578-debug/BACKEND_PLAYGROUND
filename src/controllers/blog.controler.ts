@@ -40,6 +40,9 @@ export const createpost = async (req: Authrequest, res: Response) => {
     }
 }
 
+//ADDED ADVANCED QUERY IN GETBLOGS
+
+
 export const getallblogs = async (req: Authrequest, res: Response) => {
     try { 
         if (!req.user) {
